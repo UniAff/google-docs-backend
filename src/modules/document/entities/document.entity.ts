@@ -14,8 +14,8 @@ export class Document {
   @Column()
   title: string;
 
-  @Column('json')
-  content: Record<string, any>;
+  @Column()
+  filePath: string;
 
   @CreateDateColumn()
   createdAt: Date;
