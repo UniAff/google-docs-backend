@@ -84,4 +84,30 @@ export class DocumentService {
 
     return this.documentRepository.save(document);
   }
+
+  async deleteDocument(id: number): Promise<void> {
+    const document = await this.getDocumentById(id);
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${id} not found.`);
+    }
+
+    if (document.filePath) {
+      try {
+        fs.unlinkSync(document.filePath);
+      } catch (error) {
+        throw new InternalServerErrorException(
+          `Error deleting the file: ${error.message}`,
+        );
+      }
+    }
+
+    try {
+      await this.documentRepository.remove(document);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Error deleting the document: ${error.message}`,
+      );
+    }
+  }
 }

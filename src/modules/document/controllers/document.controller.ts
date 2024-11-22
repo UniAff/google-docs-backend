@@ -12,6 +12,7 @@ import {
   Res,
   BadRequestException,
   InternalServerErrorException,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentService } from '../services/document.service';
@@ -188,6 +189,30 @@ export class DocumentController {
       }
       throw new InternalServerErrorException(
         `Error retrieving file content: ${error.message}`,
+      );
+    }
+  }
+
+  @Delete(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Document deleted successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Document not found' })
+  @ApiResponse({
+    status: 500,
+    description: 'Error deleting the document or associated file',
+  })
+  async deleteDocument(@Param('id') id: number): Promise<{ message: string }> {
+    try {
+      await this.documentService.deleteDocument(id);
+      return { message: `Document with ID ${id} deleted successfully.` };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(
+        `Error deleting document: ${error.message}`,
       );
     }
   }
