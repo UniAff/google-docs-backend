@@ -94,8 +94,13 @@ export class DocumentService {
 
     if (document.filePath) {
       try {
-        fs.unlinkSync(document.filePath);
+        if (fs.existsSync(document.filePath)) {
+          fs.unlinkSync(document.filePath);
+        } else {
+          console.warn(`File not found on disk: ${document.filePath}`);
+        }
       } catch (error) {
+        console.error(`Error deleting the file: ${error.message}`);
         throw new InternalServerErrorException(
           `Error deleting the file: ${error.message}`,
         );
